@@ -7,7 +7,6 @@ import sys
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-import powerlaw
 from datetime import datetime
 
 assert sys.version_info >= (3, 8), "This script requires Python 3.8 or higher"
@@ -123,7 +122,7 @@ def parse_file(file: Path) -> nx.DiGraph:
                 "link_sentiment": link_sentiment,
                 "properties": properties,
             }
-            graph.add_edge(source_subreddit, target_subreddit, attrs=attributes)
+            graph.add_edge(source_subreddit, target_subreddit, **attributes)
 
     return graph
 
@@ -136,8 +135,11 @@ def graph_density(graph: nx.DiGraph) -> float:
     return nx.density(graph)
 
 def filter_by_date_example(graph: nx.DiGraph):
+    start_date = datetime(2015, 1, 1)
+    end_date = datetime(2015, 1, 15)
     edges = graph.edges(data=True)
-    # graph.subgraph(edge for edge in edges if edge["attrs"][""])
+    new_graph = graph.edge_subgraph((edge[0], edge[1]) for edge in edges if start_date <= edge[2]["timestamp"] <= end_date)
+    print(new_graph)
 
 """
 Samples edges and ceates a subgraph
@@ -176,5 +178,3 @@ def main():
     print(graph)
     print(graph_density(graph))
     filter_by_date_example(graph)
-
-    print(graph_density(graph))
