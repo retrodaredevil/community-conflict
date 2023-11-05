@@ -20,8 +20,11 @@ def parse_file(file: Path) -> nx.DiGraph:
 
     return graph
 
+def graph_density(graph: nx.DiGraph) -> float:
+    return nx.density(graph)
 
 def main():
     graph = parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"))
     print(graph)
+    print(graph_density(graph))
 
