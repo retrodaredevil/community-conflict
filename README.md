@@ -3,6 +3,8 @@ A social network analysis of how different subreddits interact with each other
 
 https://snap.stanford.edu/data/soc-RedditHyperlinks.html
 
+https://lit.eecs.umich.edu/geoliwc/liwc_dictionary.html
+
 ## Setup and Running
 
 ### Linux

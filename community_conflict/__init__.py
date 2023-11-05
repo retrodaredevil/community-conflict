@@ -8,9 +8,100 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import powerlaw
+from datetime import datetime
 
 assert sys.version_info >= (3, 8), "This script requires Python 3.8 or higher"
 
+
+# POST_PROPERTIES: a vector representing the text properties of the source post, listed as a list of comma separated numbers. The vector elements are the following:
+PROPERTY_KEYS = [
+    "Number of characters",
+    "Number of characters without counting white space",
+    "Fraction of alphabetical characters",
+    "Fraction of digits",
+    "Fraction of uppercase characters",
+    "Fraction of white spaces",
+    "Fraction of special characters, such as comma, exclamation mark, etc.",
+    "Number of words",
+    "Number of unique works",
+    "Number of long words (at least 6 characters)",
+    "Average word length",
+    "Number of unique stopwords",
+    "Fraction of stopwords",
+    "Number of sentences",
+    "Number of long sentences (at least 10 words)",
+    "Average number of characters per sentence",
+    "Average number of words per sentence",
+    "Automated readability index",
+    "Positive sentiment calculated by VADER",
+    "Negative sentiment calculated by VADER",
+    "Compound sentiment calculated by VADER",
+    "LIWC_Funct",
+    "LIWC_Pronoun",
+    "LIWC_Ppron",
+    "LIWC_I",
+    "LIWC_We",
+    "LIWC_You",
+    "LIWC_SheHe",
+    "LIWC_They",
+    "LIWC_Ipron",
+    "LIWC_Article",
+    "LIWC_Verbs",
+    "LIWC_AuxVb",
+    "LIWC_Past",
+    "LIWC_Present",
+    "LIWC_Future",
+    "LIWC_Adverbs",
+    "LIWC_Prep",
+    "LIWC_Conj",
+    "LIWC_Negate",
+    "LIWC_Quant",
+    "LIWC_Numbers",
+    "LIWC_Swear",
+    "LIWC_Social",
+    "LIWC_Family",
+    "LIWC_Friends",
+    "LIWC_Humans",
+    "LIWC_Affect",
+    "LIWC_Posemo",
+    "LIWC_Negemo",
+    "LIWC_Anx",
+    "LIWC_Anger",
+    "LIWC_Sad",
+    "LIWC_CogMech",
+    "LIWC_Insight",
+    "LIWC_Cause",
+    "LIWC_Discrep",
+    "LIWC_Tentat",
+    "LIWC_Certain",
+    "LIWC_Inhib",
+    "LIWC_Incl",
+    "LIWC_Excl",
+    "LIWC_Percept",
+    "LIWC_See",
+    "LIWC_Hear",
+    "LIWC_Feel",
+    "LIWC_Bio",
+    "LIWC_Body",
+    "LIWC_Health",
+    "LIWC_Sexual",
+    "LIWC_Ingest",
+    "LIWC_Relativ",
+    "LIWC_Motion",
+    "LIWC_Space",
+    "LIWC_Time",
+    "LIWC_Work",
+    "LIWC_Achiev",
+    "LIWC_Leisure",
+    "LIWC_Home",
+    "LIWC_Money",
+    "LIWC_Relig",
+    "LIWC_Death",
+    "LIWC_Assent",
+    "LIWC_Dissent",
+    "LIWC_Nonflu",
+    "LIWC_Filler",
+]
 
 def parse_file(file: Path) -> nx.DiGraph:
     graph = nx.DiGraph()
@@ -21,8 +112,18 @@ def parse_file(file: Path) -> nx.DiGraph:
             parts = line.split("\t")
             source_subreddit = parts[0]
             target_subreddit = parts[1]
+            post_id = parts[2]
+            timestamp_string = parts[3]
+            link_sentiment = int(parts[4])
+            properties = [float(a) for a in parts[5].split(",")]
             # print(f"{source_subreddit:>25}  -->  {target_subreddit}")
-            graph.add_edge(source_subreddit, target_subreddit)
+            attributes = {
+                "post_id": post_id,
+                "timestamp": datetime.strptime(timestamp_string, "%Y-%m-%d %H:%M:%S"),
+                "link_sentiment": link_sentiment,
+                "properties": properties,
+            }
+            graph.add_edge(source_subreddit, target_subreddit, attrs=attributes)
 
     return graph
 
@@ -30,15 +131,20 @@ def parse_file(file: Path) -> nx.DiGraph:
 Calculates Density
 returns a float
 """
+
 def graph_density(graph: nx.DiGraph) -> float:
     return nx.density(graph)
+
+def filter_by_date_example(graph: nx.DiGraph):
+    edges = graph.edges(data=True)
+    # graph.subgraph(edge for edge in edges if edge["attrs"][""])
 
 """
 Samples edges and ceates a subgraph
 returns a graph
 """
 def sample_edges(graph: nx.DiGraph, sample_count: int) -> nx.DiGraph:
-    random_nodes = ran.sample(list(graph.edges), 1000)
+    random_nodes = random.sample(list(graph.edges), 1000)
     return graph.edge_subgraph(random_nodes)
 
 def get_random_edge_subgraph(num_edges: int, graph: nx.Graph) -> nx.Graph:
@@ -67,7 +173,8 @@ def basic_info(graph: nx.DiGraph):
 
 def main():
     graph = parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"))
-    print(graph) # prints number of edges and nodes
-    basic_info(graph)
+    print(graph)
+    print(graph_density(graph))
+    filter_by_date_example(graph)
 
     print(graph_density(graph))
