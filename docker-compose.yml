@@ -1,7 +1,0 @@
-version: "3.7"
-services:
-  community-conflict:
-    build:
-      context: .
-    stdin_open: true
-    tty: true

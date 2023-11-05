@@ -1,1 +1,2 @@
-snap-stanford
+# https://pypi.org/project/networkx/
+networkx==3.2.1
