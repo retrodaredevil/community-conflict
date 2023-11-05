@@ -1,10 +1,13 @@
 from pathlib import Path
 
-import random as ran
 import networkx as nx
 import pylab as plt
 from networkx.drawing.nx_agraph import graphviz_layout
 import sys
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+import powerlaw
 
 assert sys.version_info >= (3, 8), "This script requires Python 3.8 or higher"
 
@@ -38,6 +41,33 @@ def sample_edges(graph: nx.DiGraph, sample_count: int) -> nx.DiGraph:
     random_nodes = ran.sample(list(graph.edges), 1000)
     return graph.edge_subgraph(random_nodes)
 
+def get_random_edge_subgraph(num_edges: int, graph: nx.Graph) -> nx.Graph:
+    edges = random.sample(list(graph.edges), num_edges)
+    return graph.edge_subgraph(edges)
+
+def get_random_node_subgraph(num_nodes: int, graph: nx.Graph) -> nx.Graph:
+    nodes = random.sample(list(graph.nodes), num_nodes)
+    return graph.subgraph(nodes)
+
+def plot_dist(graph):
+    hist = nx.degree_histogram(graph)
+    plt.plot(range(0, len(hist)), hist, ".")
+    plt.title("Degree Distribution")
+    plt.xlabel("Degree")
+    plt.ylabel("# of Nodes")
+    plt.loglog()
+    plt.show()
+
+def basic_info(graph: nx.DiGraph):
+    print("Global Clustering Coefficient:", nx.average_clustering(graph)) # large for real world networks
+    #print("Path length:", nx.average_shortest_path_length(graph)) # small for real world networks
+    print("Density:", nx.density(graph)) # sparse for real world network
+    hist = nx.degree_histogram(graph)
+    plot_dist(graph)
+
 def main():
     graph = parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"))
-    print(graph)
+    print(graph) # prints number of edges and nodes
+    basic_info(graph)
+
+    print(graph_density(graph))
