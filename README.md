@@ -10,6 +10,7 @@ https://snap.stanford.edu/data/soc-RedditHyperlinks.html
 ```shell
 # make sure venv is installed
 sudo apt install python3-venv
+sudo apt install graphviz graphviz-dev
 
 ./setup_venv.sh
 

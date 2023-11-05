@@ -1,2 +1,5 @@
 # https://pypi.org/project/networkx/
-networkx==3.2.1
+networkx>=3.1
+pygraphviz==1.11
+matplotlib==3.7.3
+scipy==1.10.1
