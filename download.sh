@@ -5,5 +5,5 @@ cd "$BASEDIR"
 
 mkdir -p .downloads/
 cd .downloads
-wget https://snap.stanford.edu/data/soc-redditHyperlinks-body.tsv
-wget https://snap.stanford.edu/data/soc-redditHyperlinks-title.tsv
+curl -o soc-redditHyperlinks-body.tsv https://snap.stanford.edu/data/soc-redditHyperlinks-body.tsv
+curl -o soc-redditHyperlinks-title.tsv https://snap.stanford.edu/data/soc-redditHyperlinks-title.tsv
