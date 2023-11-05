@@ -23,6 +23,8 @@ def parse_file(file: Path) -> nx.DiGraph:
 
     return graph
 
+def graph_density(graph: nx.DiGraph) -> float:
+    return nx.density(graph)
 def plot_dist(graph):
     hist = nx.degree_histogram(graph)   
     plt.plot(range(0, len(hist)), hist, ".")
@@ -47,4 +49,5 @@ def main():
     print(graph) # prints number of edges and nodes
     basic_info(graph)
 
+    print(graph_density(graph))
 
