@@ -15,11 +15,13 @@ def parse_file(file: Path) -> nx.DiGraph:
             parts = line.split("\t")
             source_subreddit = parts[0]
             target_subreddit = parts[1]
-            print(f"{source_subreddit:>25}  -->  {target_subreddit}")
+            # print(f"{source_subreddit:>25}  -->  {target_subreddit}")
+            graph.add_edge(source_subreddit, target_subreddit)
 
     return graph
 
 
 def main():
-    parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"))
+    graph = parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"))
+    print(graph)
 

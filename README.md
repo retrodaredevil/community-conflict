@@ -1,6 +1,8 @@
 # community-conflict
 A social network analysis of how different subreddits interact with each other
 
+https://snap.stanford.edu/data/soc-RedditHyperlinks.html
+
 ## Setup and Running
 
 ### Linux
