@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import networkx as nx
 import pylab as plt
@@ -101,6 +102,9 @@ PROPERTY_KEYS = [
     "LIWC_Nonflu",
     "LIWC_Filler",
 ]
+
+# If you need to typehint a node, then you can use this type even though its not that useful as a type itself
+Node = Any
 
 def parse_file(file: Path) -> nx.DiGraph:
     graph = nx.DiGraph()
