@@ -15,7 +15,8 @@ def visualize_number_of_edges_each_month_in_range(title_prefix: str, start_date:
     edges = graph.edges(data=True)
 
     node_names: List[str] = []
-    values: List[int] = []
+    edge_values: List[int] = []
+    node_values: List[int] = []
 
     period_start = start_date
     while (period_end := period_start + step) <= end_date:
@@ -23,17 +24,26 @@ def visualize_number_of_edges_each_month_in_range(title_prefix: str, start_date:
             (edge[0], edge[1]) for edge in edges if period_start <= edge[2]["timestamp"] <= period_end
         )
         node_names.append(f"{calendar.month_name[period_start.month]} {period_start.year}")
-        values.append(len(new_graph.edges))
+        edge_values.append(len(new_graph.edges))
+        node_values.append(len(new_graph.nodes))
 
         period_start = period_end
 
-    plt.bar(range(len(node_names)), values, tick_label=node_names)
-    plt.xlabel('Month')
-    plt.ylabel("Number of Posts")
-    plt.title(f"{title_prefix} - Number of posts each month")
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
+    # Create a grouped bar chart
+    width = 0.35
+    x = range(len(node_names))
+    fig, ax = plt.subplots()
+    ax.bar(x, edge_values, width, label='Posts')
+    ax.bar([i + width for i in x], node_values, width, label='Subreddits')
 
+    ax.set_xlabel('Month')
+    ax.set_ylabel('Count')
+    ax.set_title(f'{title_prefix} - Number of Edges and Nodes Each Month')
+    ax.set_xticks([i + width / 2 for i in x])
+    ax.set_xticklabels(node_names, rotation=45, ha='right')
+    ax.legend()
+
+    plt.tight_layout()
     plt.show()
 
 
