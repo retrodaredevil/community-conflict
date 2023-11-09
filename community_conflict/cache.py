@@ -2,10 +2,12 @@ import pickle
 import traceback
 from pathlib import Path
 
+import networkx as nx
+
 from community_conflict import parse_file
 
 
-def read_or_parse_file(raw_data_file: Path, cache_file: Path):
+def read_or_parse_file(raw_data_file: Path, cache_file: Path) -> nx.DiGraph:
     try:
         if cache_file.exists():
             with cache_file.open('rb') as f:

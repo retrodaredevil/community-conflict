@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from matplotlib import pyplot as plt
 
 from community_conflict.cache import read_or_parse_file
+from community_conflict.filter import subgraph_with_negative_posts
 
 
 def visualize_number_of_edges_each_month_in_range(title_prefix: str, start_date: datetime, end_date: datetime, graph: nx.DiGraph):
@@ -53,7 +54,14 @@ def main():
 
     title_graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"), Path(".cache/soc-redditHyperlinks-title.pickle"))
     body_graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-body.tsv"), Path(".cache/soc-redditHyperlinks-body.pickle"))
-    for name, graph in [("title", title_graph), ("body", body_graph)]:
+    title_graph_negative = subgraph_with_negative_posts(title_graph)
+    body_graph_negative = subgraph_with_negative_posts(body_graph)
+    for name, graph in [
+        ("title", title_graph),
+        ("body", body_graph),
+        ("negative title", title_graph_negative),
+        ("negative body", body_graph_negative)
+    ]:
         print()
         print(name)
         visualize_number_of_edges_each_month_in_range(f"{name} dataset", start_date, end_date, graph)

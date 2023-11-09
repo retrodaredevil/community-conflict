@@ -7,6 +7,8 @@ from community_conflict import Node
 from community_conflict.cache import read_or_parse_file
 import matplotlib.pyplot as plt
 
+from community_conflict.filter import subgraph_with_negative_posts
+
 
 def visualize_top_statistic(graph: nx.DiGraph, title_prefix: str, statistic_name: str, statistic: Callable[[nx.DiGraph, Node], float], num_items=10):
     # Calculate the out-degrees of all nodes
@@ -35,7 +37,14 @@ def visualize_top_statistic(graph: nx.DiGraph, title_prefix: str, statistic_name
 def main():
     title_graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"), Path(".cache/soc-redditHyperlinks-title.pickle"))
     body_graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-body.tsv"), Path(".cache/soc-redditHyperlinks-body.pickle"))
-    for name, graph in [("title", title_graph), ("body", body_graph)]:
+    title_graph_negative = subgraph_with_negative_posts(title_graph)
+    body_graph_negative = subgraph_with_negative_posts(body_graph)
+    for name, graph in [
+        ("title", title_graph),
+        ("body", body_graph),
+        ("negative title", title_graph_negative),
+        ("negative body", body_graph_negative)
+    ]:
         print()
         print(name)
         print(graph)
