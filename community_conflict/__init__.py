@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import networkx as nx
 import pylab as plt
@@ -11,6 +12,7 @@ from datetime import datetime
 import pickle
 
 assert sys.version_info >= (3, 8), "This script requires Python 3.8 or higher"
+
 
 # POST_PROPERTIES: a vector representing the text properties of the source post, listed as a list of comma separated numbers. The vector elements are the following:
 PROPERTY_KEYS = [
@@ -102,6 +104,9 @@ PROPERTY_KEYS = [
     "LIWC_Filler",
 ]
 
+# If you need to typehint a node, then you can use this type even though its not that useful as a type itself
+Node = Any
+
 
 def parse_file(file: Path) -> nx.DiGraph:
     graph = nx.DiGraph()
@@ -142,8 +147,7 @@ def filter_by_date_example(graph: nx.DiGraph):
     start_date = datetime(2015, 1, 1)
     end_date = datetime(2015, 1, 15)
     edges = graph.edges(data=True)
-    new_graph = graph.edge_subgraph(
-        (edge[0], edge[1]) for edge in edges if start_date <= edge[2]["timestamp"] <= end_date)
+    new_graph = graph.edge_subgraph((edge[0], edge[1]) for edge in edges if start_date <= edge[2]["timestamp"] <= end_date)
     print(new_graph)
 
 
@@ -151,8 +155,6 @@ def filter_by_date_example(graph: nx.DiGraph):
 Samples edges and ceates a subgraph
 returns a graph
 """
-
-
 def sample_edges(graph: nx.DiGraph, sample_count: int) -> nx.DiGraph:
     random_nodes = random.sample(list(graph.edges), 1000)
     return graph.edge_subgraph(random_nodes)
@@ -240,9 +242,9 @@ def compute_centraities(graph):
 
 
 def basic_info(graph: nx.DiGraph):
-    print("Global Clustering Coefficient:", nx.average_clustering(graph))  # large for real world networks
-    # print("Path length:", nx.average_shortest_path_length(graph)) # small for real world networks
-    print("Density:", nx.density(graph))  # sparse for real world network
+    print("Global Clustering Coefficient:", nx.average_clustering(graph)) # large for real world networks
+    #print("Path length:", nx.average_shortest_path_length(graph)) # small for real world networks
+    print("Density:", nx.density(graph)) # sparse for real world network
     hist = nx.degree_histogram(graph)
     plot_dist(graph)
 
@@ -250,6 +252,7 @@ def basic_info(graph: nx.DiGraph):
 def main():
     graph = parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"))
     print(graph)
+    print(graph_density(graph))
     basic_info(graph)
 
     #show_centralities()
