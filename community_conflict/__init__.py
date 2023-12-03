@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import networkx as nx
 import pylab as plt
@@ -8,9 +9,13 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
+<<<<<<< HEAD
 import cdlib
 from cdlib import algorithms
 from cdlib import viz
+=======
+import pickle
+>>>>>>> 100f8552113734e140b6d832f5a53bf54fcba889
 
 assert sys.version_info >= (3, 8), "This script requires Python 3.8 or higher"
 
@@ -105,6 +110,10 @@ PROPERTY_KEYS = [
     "LIWC_Filler",
 ]
 
+# If you need to typehint a node, then you can use this type even though its not that useful as a type itself
+Node = Any
+
+
 def parse_file(file: Path) -> nx.DiGraph:
     graph = nx.DiGraph()
     with file.open("r") as f:
@@ -129,13 +138,16 @@ def parse_file(file: Path) -> nx.DiGraph:
 
     return graph
 
+
 """
 Calculates Density
 returns a float
 """
 
+
 def graph_density(graph: nx.DiGraph) -> float:
     return nx.density(graph)
+
 
 def filter_by_date_example(graph: nx.DiGraph):
     start_date = datetime(2015, 1, 1)
@@ -143,6 +155,7 @@ def filter_by_date_example(graph: nx.DiGraph):
     edges = graph.edges(data=True)
     new_graph = graph.edge_subgraph((edge[0], edge[1]) for edge in edges if start_date <= edge[2]["timestamp"] <= end_date)
     print(new_graph)
+
 
 """
 Samples edges and ceates a subgraph
@@ -152,13 +165,16 @@ def sample_edges(graph: nx.DiGraph, sample_count: int) -> nx.DiGraph:
     random_nodes = random.sample(list(graph.edges), 5000)
     return graph.edge_subgraph(random_nodes)
 
+
 def get_random_edge_subgraph(num_edges: int, graph: nx.Graph) -> nx.Graph:
     edges = random.sample(list(graph.edges), num_edges)
     return graph.edge_subgraph(edges)
 
+
 def get_random_node_subgraph(num_nodes: int, graph: nx.Graph) -> nx.Graph:
     nodes = random.sample(list(graph.nodes), num_nodes)
     return graph.subgraph(nodes)
+
 
 def plot_dist(graph):
     hist = nx.degree_histogram(graph)
@@ -169,8 +185,75 @@ def plot_dist(graph):
     plt.loglog()
     plt.show()
 
+<<<<<<< HEAD
 def real_world_properties(graph: nx.DiGraph):
     #print("Global Clustering Coefficient:", nx.average_clustering(graph)) # large for real world networks
+=======
+
+def show_centralities():
+    # Node Betweenness Centrality
+    with open("computed_values/node_betweenness_cent", "rb") as f:
+        node_betweenness_cent = pickle.load(f)
+    sorted_node_betweenness_cent = sorted(node_betweenness_cent.items(), key=lambda x: x[1], reverse=True)
+    print("|{:<25}|{:>25}|".format("Subreddit Name", "Betweenness Centrality"))
+    print("_"*53)
+    for node in sorted_node_betweenness_cent[:15]:
+        print("|{:<25}|{:>25.10f}|".format(node[0], node[1]))
+
+    print("\n")
+
+    # Degree Centrality
+    with open("computed_values/degree_cent", "rb") as f:
+        degree_cent = pickle.load(f)
+    degree_cent = sorted(degree_cent.items(), key=lambda x: x[1], reverse=True)
+    print("|{:<25}|{:>25}|".format("Subreddit Name", "Degree Centrality"))
+    print("_"*53)
+    for node in degree_cent[:15]:
+        print("|{:<25}|{:>25.10f}|".format(node[0], node[1]))
+
+
+def compute_centraities(graph):
+    """Compute various centrality measures relevant to our data and
+       saves them to the computed_values folder"""
+    # TODO: Katz centralities don't seem to converge with the default iterations of 1000. Possibly try larger
+    # print("Computing Katz Centralities")
+    # katz_cent = nx.katz_centrality(graph, max_iter=1000)
+    # print("Katz centralities:", katz_cent)
+
+    # Completed
+    # with open("computed_values/closeness_cent", "wb") as f:
+    #     print("Computing Closeness Centralities")
+    #     closeness_cent = nx.closeness_centrality(graph)
+    #     pickle.dump(closeness_cent, f)
+
+    # Completed
+    # with open("computed_values/node_betweenness_cent", "wb") as f:
+    #     print("Computing Node Betweenness Centralities")
+    #     node_betweenness_cent = nx.betweenness_centrality(graph)
+    #     pickle.dump(node_betweenness_cent, f)
+
+    # TODO: This one might be useful, but will likely take a very long time to compute properly
+    # with open("computed_values/edge_betweenness_cent", "wb") as f:
+    #     print("Computing Edge Betweenness Centralities")
+    #     edge_betweenness_cent = nx.edge_betweenness_centrality(graph)
+    #     pickle.dump(edge_betweenness_cent, f)
+
+    # Completed
+    # with open("computed_values/harmonic_cent", "wb") as f:
+    #     print("Computing Harmonic Centralities")
+    #     harmonic_cent = nx.harmonic_centrality(graph)
+    #     pickle.dump(harmonic_cent, f)
+
+    # Completed
+    # with open("computed_values/degree_cent", "wb") as f:
+    #     print("Computing Degree Centralities")
+    #     degree_cent = nx.degree_centrality(graph)
+    #     pickle.dump(degree_cent, f)
+
+
+def basic_info(graph: nx.DiGraph):
+    print("Global Clustering Coefficient:", nx.average_clustering(graph)) # large for real world networks
+>>>>>>> 100f8552113734e140b6d832f5a53bf54fcba889
     #print("Path length:", nx.average_shortest_path_length(graph)) # small for real world networks
     #print("Density:", nx.density(graph)) # sparse for real world network
     print(nx.number_strongly_connected_components(graph))
@@ -215,9 +298,17 @@ def louvain(graph: nx.DiGraph):
     #        file.write(f"Community {i + 1}: {list(community)}\n")
 
 
+
+
 def main():
     graph = parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"))
-    #small_graph = sample_edges(graph, 20000)
-    #louvain(graph)
-    #print(graph)
-    er = nx.erdos_renyi_graph()
+<<<<<<< HEAD
+    print(graph)
+    print(graph_density(graph))
+    basic_info(graph)
+
+    #show_centralities()
+    #compute_centraities(graph)
+
+    #filter_by_date_example(graph)
+>>>>>>> 100f8552113734e140b6d832f5a53bf54fcba889
