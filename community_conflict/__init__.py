@@ -1,21 +1,13 @@
+import pickle
+import random
+import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import matplotlib.pyplot as plt
 import networkx as nx
 import pylab as plt
-from networkx.drawing.nx_agraph import graphviz_layout
-import sys
-import random
-import numpy as np
-import matplotlib.pyplot as plt
-from datetime import datetime
-<<<<<<< HEAD
-import cdlib
-from cdlib import algorithms
-from cdlib import viz
-=======
-import pickle
->>>>>>> 100f8552113734e140b6d832f5a53bf54fcba889
 
 assert sys.version_info >= (3, 8), "This script requires Python 3.8 or higher"
 
@@ -185,11 +177,6 @@ def plot_dist(graph):
     plt.loglog()
     plt.show()
 
-<<<<<<< HEAD
-def real_world_properties(graph: nx.DiGraph):
-    #print("Global Clustering Coefficient:", nx.average_clustering(graph)) # large for real world networks
-=======
-
 def show_centralities():
     # Node Betweenness Centrality
     with open("computed_values/node_betweenness_cent", "rb") as f:
@@ -253,15 +240,12 @@ def compute_centraities(graph):
 
 def basic_info(graph: nx.DiGraph):
     print("Global Clustering Coefficient:", nx.average_clustering(graph)) # large for real world networks
->>>>>>> 100f8552113734e140b6d832f5a53bf54fcba889
     #print("Path length:", nx.average_shortest_path_length(graph)) # small for real world networks
     #print("Density:", nx.density(graph)) # sparse for real world network
     print(nx.number_strongly_connected_components(graph))
     print(nx.number_weakly_connected_components(graph))
     #hist = nx.degree_histogram(graph)
     #plot_dist(graph)
-
-def basic_info(graph: nx.DiGraph):
     print(sum(dict(graph.degree()).values())/float(len(graph)))
 
 def greedy_modularity(graph: nx.DiGraph):
@@ -302,7 +286,6 @@ def louvain(graph: nx.DiGraph):
 
 def main():
     graph = parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"))
-<<<<<<< HEAD
     print(graph)
     print(graph_density(graph))
     basic_info(graph)
@@ -311,4 +294,3 @@ def main():
     #compute_centraities(graph)
 
     #filter_by_date_example(graph)
->>>>>>> 100f8552113734e140b6d832f5a53bf54fcba889
