@@ -7,7 +7,6 @@ from community_conflict.cache import read_or_parse_file
 from community_conflict.subgraphs import sample_edges
 from community_conflict.subgraphs import sample_nodes
 import matplotlib
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 def print_graph(graph: nx.digraph):
