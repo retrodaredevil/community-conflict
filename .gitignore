@@ -4,6 +4,7 @@ greedy_modularity.txt
 .downloads/
 .cache/
 .idea/
+outputs/
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,linux,windows,macos,vim,pycharm,visualstudiocode

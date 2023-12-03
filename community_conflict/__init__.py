@@ -3,7 +3,7 @@ import random
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict, List
 
 import matplotlib.pyplot as plt
 from community_conflict.density import graph_density
@@ -106,8 +106,16 @@ PROPERTY_KEYS = [
 # If you need to typehint a node, then you can use this type even though its not that useful as a type itself
 Node = Any
 
-def parse_file(file: Path) -> nx.DiGraph:
-    graph = nx.DiGraph()
+
+class NodeAttributes(TypedDict):
+    post_id: str
+    timestamp: datetime
+    link_sentiment: int
+    properties: List[float]
+
+
+def parse_file(file: Path) -> nx.MultiDiGraph:
+    graph = nx.MultiDiGraph()
     with file.open("r") as f:
         f.readline()  # ignore the first line
         while line := f.readline():
@@ -120,7 +128,7 @@ def parse_file(file: Path) -> nx.DiGraph:
             link_sentiment = int(parts[4])
             properties = [float(a) for a in parts[5].split(",")]
             # print(f"{source_subreddit:>25}  -->  {target_subreddit}")
-            attributes = {
+            attributes: NodeAttributes = {
                 "post_id": post_id,
                 "timestamp": datetime.strptime(timestamp_string, "%Y-%m-%d %H:%M:%S"),
                 "link_sentiment": link_sentiment,
