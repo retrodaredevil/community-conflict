@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
+from community_conflict.density import graph_density
 import networkx as nx
 import pylab as plt
 
