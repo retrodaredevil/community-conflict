@@ -105,7 +105,6 @@ PROPERTY_KEYS = [
 # If you need to typehint a node, then you can use this type even though its not that useful as a type itself
 Node = Any
 
-
 def parse_file(file: Path) -> nx.DiGraph:
     graph = nx.DiGraph()
     with file.open("r") as f:
@@ -131,14 +130,6 @@ def parse_file(file: Path) -> nx.DiGraph:
     return graph
 
 
-"""
-Calculates Density
-returns a float
-"""
-
-
-def graph_density(graph: nx.DiGraph) -> float:
-    return nx.density(graph)
 
 
 def filter_by_date_example(graph: nx.DiGraph):
@@ -147,25 +138,6 @@ def filter_by_date_example(graph: nx.DiGraph):
     edges = graph.edges(data=True)
     new_graph = graph.edge_subgraph((edge[0], edge[1]) for edge in edges if start_date <= edge[2]["timestamp"] <= end_date)
     print(new_graph)
-
-
-"""
-Samples edges and ceates a subgraph
-returns a graph
-"""
-def sample_edges(graph: nx.DiGraph, sample_count: int) -> nx.DiGraph:
-    random_nodes = random.sample(list(graph.edges), 5000)
-    return graph.edge_subgraph(random_nodes)
-
-
-def get_random_edge_subgraph(num_edges: int, graph: nx.Graph) -> nx.Graph:
-    edges = random.sample(list(graph.edges), num_edges)
-    return graph.edge_subgraph(edges)
-
-
-def get_random_node_subgraph(num_nodes: int, graph: nx.Graph) -> nx.Graph:
-    nodes = random.sample(list(graph.nodes), num_nodes)
-    return graph.subgraph(nodes)
 
 
 def plot_dist(graph):
