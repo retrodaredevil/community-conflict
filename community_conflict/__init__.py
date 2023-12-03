@@ -8,6 +8,9 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
+import cdlib
+from cdlib import algorithms
+from cdlib import viz
 
 assert sys.version_info >= (3, 8), "This script requires Python 3.8 or higher"
 
@@ -146,7 +149,7 @@ Samples edges and ceates a subgraph
 returns a graph
 """
 def sample_edges(graph: nx.DiGraph, sample_count: int) -> nx.DiGraph:
-    random_nodes = random.sample(list(graph.edges), 1000)
+    random_nodes = random.sample(list(graph.edges), 5000)
     return graph.edge_subgraph(random_nodes)
 
 def get_random_edge_subgraph(num_edges: int, graph: nx.Graph) -> nx.Graph:
@@ -166,15 +169,55 @@ def plot_dist(graph):
     plt.loglog()
     plt.show()
 
-def basic_info(graph: nx.DiGraph):
-    print("Global Clustering Coefficient:", nx.average_clustering(graph)) # large for real world networks
+def real_world_properties(graph: nx.DiGraph):
+    #print("Global Clustering Coefficient:", nx.average_clustering(graph)) # large for real world networks
     #print("Path length:", nx.average_shortest_path_length(graph)) # small for real world networks
-    print("Density:", nx.density(graph)) # sparse for real world network
-    hist = nx.degree_histogram(graph)
-    plot_dist(graph)
+    #print("Density:", nx.density(graph)) # sparse for real world network
+    print(nx.number_strongly_connected_components(graph))
+    print(nx.number_weakly_connected_components(graph))
+    #hist = nx.degree_histogram(graph)
+    #plot_dist(graph)
+
+def basic_info(graph: nx.DiGraph):
+    print(sum(dict(graph.degree()).values())/float(len(graph)))
+
+def greedy_modularity(graph: nx.DiGraph):
+    gn_comm = list(nx.community.greedy_modularity_communities(graph))
+    output_file_path = 'greedy_modularity.txt'
+    with open(output_file_path, 'w') as file:
+        for step, community in enumerate(gn_comm):
+            file.write(f"Step {step + 1}: {community}\n")
+
+def louvain(graph: nx.DiGraph):
+    #output_file_path = 'louvain.txt'
+    louvain_coms = list(nx.algorithms.community.asyn_lpa_communities(graph))
+
+    superG = nx.DiGraph()
+
+    for i, community in enumerate(louvain_coms):
+        superG.add_node(f"SuperNode_{i + 1}", members=list(community))
+
+    for edge in graph.edges():
+        for i, community in enumerate(louvain_coms):
+            if edge[0] in community:
+                for j, other_community in enumerate(louvain_coms):
+                    if edge[1] in other_community and i != j:
+                        superG.add_edge(f"SuperNode_{i + 1}", f"SuperNode_{j + 1}")
+
+    # Plot the supernode graph
+    pos = nx.spring_layout(superG)
+    nx.draw(superG, pos, with_labels=False, node_size=75, node_color='skyblue',edge_color='gray')
+    plt.title('Supernode Graph')
+    plt.show()
+
+    #with open(output_file_path, 'w') as file:
+    #    for i, community in enumerate(louvain_coms):
+    #        file.write(f"Community {i + 1}: {list(community)}\n")
+
 
 def main():
     graph = parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"))
-    print(graph)
-    print(graph_density(graph))
-    filter_by_date_example(graph)
+    #small_graph = sample_edges(graph, 20000)
+    #louvain(graph)
+    #print(graph)
+    er = nx.erdos_renyi_graph()
