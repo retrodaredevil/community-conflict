@@ -20,7 +20,7 @@ def print_graph(graph: nx.digraph):
     nx.draw_networkx_edges(graph, pos, width=1, edge_color='gray', arrows=True, connectionstyle='arc3, rad = 0.1')
 
     # Draw labels
-    nx.draw_networkx_labels(graph, pos, font_size=3, font_color='black')
+    #nx.draw_networkx_labels(graph, pos, font_size=3, font_color='black')
 
     # Display the graph
     plt.axis('off')  # Turn off axis numbers and ticks
@@ -28,8 +28,10 @@ def print_graph(graph: nx.digraph):
 
 def main():
     graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"), Path(".cache/soc-redditHyperlinks-title.pickle"))
-    #edgeSub = sample_edges(graph, 500)
-    nodeSub = sample_nodes(graph, 500)
+    #edgeSub = sample_edges(graph, 1500)
+    #print(edgeSub)
+    nodeSub = sample_nodes(graph, 2000)
+    print(nodeSub)
     #print_graph(edgeSub)
     print_graph(nodeSub)
 
