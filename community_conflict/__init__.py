@@ -201,7 +201,4 @@ def main():
     print(graph_density(graph))
     basic_info(graph)
 
-    #show_centralities()
-    #compute_centraities(graph)
-
     #filter_by_date_example(graph)
