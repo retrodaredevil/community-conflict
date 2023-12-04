@@ -3,12 +3,12 @@
 """
 This file has logic for collapsing a multi-graph into a simple graph
 """
-from typing import List, TypedDict, Dict
+from typing import List, TypedDict
 
 import networkx as nx
 
 from community_conflict import NodeAttributes, Node
-from community_conflict.visualize_graph import print_graph
+from community_conflict.compute_weight import liwc_similarity
 
 
 class CollapsedNodeAttributes(TypedDict):
@@ -25,8 +25,10 @@ def contraction(
         elif edge_data["link_sentiment"] == -1:
             weight -= 2
 
+    liwc = liwc_similarity(edge_data_list)  # Note: In our dataset, the maximum value of this is 0.03
+
     return {
-        "weight": max(weight, 0.0)
+        "weight": max(weight, 0.0) * liwc
     }
 
 
@@ -51,7 +53,6 @@ def __test_main():
     print(multi.get_edge_data(1, 2))
     print(nx.Graph(multi).get_edge_data(1, 2))
     print(multi.get_edge_data(3, 1))
-    print_graph(multi)
 
 
 if __name__ == '__main__':
