@@ -7,7 +7,7 @@ from community_conflict.subgraphs import sample_edges
 from community_conflict.subgraphs import sample_nodes
 import matplotlib.pyplot as plt
 
-def draw_graph(graph: nx.graph, layout: int = 3, color_type: bool = False, node_size: int = 50, edge_width: float = 0.75):
+def draw_graph(graph: nx.MultiDiGraph, layout: int = 3, color_type: bool = False, node_size: int = 50, edge_width: float = 0.75):
     # positions for all nodes and layouts
     if(layout == 0):
         pos = nx.kamada_kawai_layout(graph) # looks nice, computationaly expensive, and does work well with bigger networks for some reason
