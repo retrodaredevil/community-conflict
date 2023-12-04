@@ -11,9 +11,10 @@ from community_conflict.cache import read_or_parse_file
 from community_conflict.filter import subgraph_with_negative_posts
 
 
-def visualize_number_of_edges_each_month_in_range(title_prefix: str, start_date: datetime, end_date: datetime, graph: nx.DiGraph):
+def visualize_number_of_edges_each_month_in_range(title_prefix: str, start_date: datetime, end_date: datetime, graph: nx.MultiDiGraph):
     step = relativedelta(months=1)
-    edges = graph.edges(data=True)
+    edges = graph.edges(data=True, keys=True)
+    print(list(edges)[0])
 
     node_names: List[str] = []
     edge_values: List[int] = []
@@ -22,7 +23,7 @@ def visualize_number_of_edges_each_month_in_range(title_prefix: str, start_date:
     period_start = start_date
     while (period_end := period_start + step) <= end_date:
         new_graph = graph.edge_subgraph(
-            (edge[0], edge[1]) for edge in edges if period_start <= edge[2]["timestamp"] <= period_end
+            (u, v, key) for u, v, key, data in edges if period_start <= data["timestamp"] <= period_end
         )
         node_names.append(f"{calendar.month_name[period_start.month]} {period_start.year}")
         edge_values.append(len(new_graph.edges))

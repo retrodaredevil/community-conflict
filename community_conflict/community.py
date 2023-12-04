@@ -23,10 +23,6 @@ COMMUNITIES: List[CommunityDefinition] = [
         "common_nodes": {"starwars", "marvel", "harrypotter", "thelastairbender", "gameofthrones"}
     },
     {
-        "name": "Soccer",
-        "common_nodes": {"soccer", "fifa", "soccerstreams", "worldcup", "footballhighlights", "soccernerd"}
-    },
-    {
         "name": "Technology",
         "common_nodes": {"pcmasterrace", "android", "diy", "programming", "linux", "learnprogramming", "apple", "programminghumor", 'python', 'web_design', 'machinelearning', "java", "cpp"}
     },
@@ -63,10 +59,6 @@ COMMUNITIES: List[CommunityDefinition] = [
         "common_nodes": {'gaming', 'leagueoflegends', 'games', 'dota2', 'globaloffensive', 'overwatch', 'peoplewhosayheck', 'smashbros', 'hearthstone', 'excgarated', 'oculus', 'destinythegame', 'ps4', 'wow', 'pcgaming', 'xboxone', 'tf2', 'gamedev', 'steam', 'gamingcirclejerk'}
     },
     {
-        "name": "People and Places",
-        "common_nodes": {'mhoc', 'ireland', 'toronto', 'modelusgov', 'mhocpress', 'calgary', 'ottawa', 'modeluspress', 'northernireland', 'cmhoc', 'uwaterloo', 'mhoir', 'edmonton', 'uoft', 'ontario'}
-    },
-    {
         "name": "Countries",
         "common_nodes": {'newsokur', 'japancirclejerk', 'china', 'newsokunomoral', 'japan', 'translator', 'asianamerican', 'ccj2', 'korea', 'languagelearning', 'kpop', 'aznidentity', 'asianmasculinity', 'bakanewsjp', '5555555', 'yellowperil', 'sino', 'hongkong', 'botrights', 'learnjapanese'}
     },
@@ -87,8 +79,8 @@ COMMUNITIES: List[CommunityDefinition] = [
         "common_nodes": {'playark', 'playarkservers', 'ark', 'projectmilsim', 'survivetogether', 'arkone', 'findaunit', 'ark_pc', 'arkfactions', 'playarklfg', 'funkark', 'zodiacfalls', 'jurassickingdoms', 'battleroyalegames', 'badneighbor'}
     },
     {
-        "name": "Something 2",
-        "common_nodes": {'art', 'dnd', 'magictcg', 'worldbuilding', 'boardgames', 'rpg', 'photography', 'tattoos', 'lfg', 'picrequests', 'photoshoprequest', 'icandrawthat', 'podemos', 'wallpapers', 'dwarffortress', 'itsadndmonsternow', 'itookapicture', 'dndnext'}
+        "name": "DnD and Board Games",
+        "common_nodes": {'dnd', 'magictcg', 'worldbuilding', 'boardgames', 'rpg', 'lfg', 'itsadndmonsternow', 'dndnext', 'pathfinder_rpg', 'dndbehindthescreen', 'warhammer40k', 'gametales', 'shadowrun', 'warhammer', 'spikes', 'magicthecirclejerking', 'lovecraft', 'tabletopgamedesign', 'modernmagic', 'roleplay'}
     },
     {
         "name": "Religion",
@@ -156,25 +148,36 @@ COMMUNITIES: List[CommunityDefinition] = [
     },
     {
         "name": "Multiplayer gaming",
-        "common_nodes": {'leagueoflegends', 'dota2', 'globaloffensive', 'overwatch', 'hearthstone', 'wow', 'test', '2007scape', 'postpreview', 'starcraft', 'runescape', 'twitch'}
+        "common_nodes": {'leagueoflegends', 'dota2', 'globaloffensive', 'overwatch', 'hearthstone', 'wow', 'starcraft', 'runescape', 'twitch'}
     },
     {
         "name": "Audio and Music",
         "common_nodes": {'music', 'hiphopheads', 'tipofmytongue', 'kanye', 'listentothis', 'electronicmusic', 'wearethemusicmakers', 'hiphopcirclejerk', 'guitar', 'indieheads', 'edmproduction', 'vinyl', 'metal', 'radiohead', 'monstercat', 'headphones', 'metaljerk', 'audioengineering'}
     },
-
+    {
+        "name": "Soccer",
+        "common_nodes": {"soccer", "fifa", "soccerstreams", "worldcup", "footballhighlights", "soccernerd"}
+    },
+    {
+        "name": "Cars",
+        "common_nodes": {'cars', 'teslamotors', 'justrolledintotheshop', 'mechanicadvice', 'subaru', 'shitty_car_mods', 'vandwellers', 'autos', 'jeep', 'bmw', 'autodetailing', 'carav', 'askcarsales', 'trucks', 'cartalk', 'whatcarshouldibuy', 'honda'}
+    },
 ]
 
 
 def find_definition(community: Set[Node]) -> Optional[CommunityDefinition]:
     best: Optional[CommunityDefinition] = None
-    best_percent = 0.35
+    best_score = 0.35
     for definition in COMMUNITIES:
         c = sum(1 if node in community else 0 for node in definition["common_nodes"])
         percent = c / len(definition["common_nodes"])
-        if percent > best_percent:
+
+        # The c / 20 term is arbitrary here, but tries to encourage higher count,
+        #   so that a high count has a little bit of weight and the percent itself has the majority of the weight
+        score = percent + c / 20
+        if score > best_score:
             best = definition
-            best_percent = percent
+            best_score = score
     return best
 
 
