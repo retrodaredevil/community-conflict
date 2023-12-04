@@ -13,7 +13,7 @@ class CommunityDefinition(TypedDict):
     common_nodes: Set[str]
 
 
-COMMUNITIES: List[CommunityDefinition] = [
+ALL_COMMUNITY_DEFINITIONS: List[CommunityDefinition] = [
     {
         "name": "Arts",
         "common_nodes": {"music", "books", "movies", "fantasy", "writing", "guitar"}
@@ -67,8 +67,8 @@ COMMUNITIES: List[CommunityDefinition] = [
         "common_nodes": {'minecraft', 'civcraft', 'mcservers', 'feedthebeast', 'ultrahardcore', 'mindcrack', 'civilizatonexperiment', 'devoted', 'hcfactions', 'minecraftsuggestions', 'lordsofminecraft', 'mindcrackcirclejerk', 'admincraft', 'mtaugusta', 'hcteams', 'danzilona', 'feedthebeastservers'}
     },
     {
-        "name": "Liquor",
-        "common_nodes": {'cigars', 'wine', 'bourbon', 'pipetobacco', 'cocktails', 'bartenders', 'scotch', 'alcohol', 'whiskey', 'whiskyinventory', 'whiskyporn'}
+        "name": "Liquor and Smoking",
+        "common_nodes": {'cigars', 'wine', 'bourbon', 'pipetobacco', 'cocktails', 'bartenders', 'scotch', 'alcohol', 'whiskey', 'whiskyinventory', 'whiskyporn', 'pipetobacco', 'rcigarsbattlezone', 'pipetobaccomarket', 'cigarmarket', 'thepeoplesrcigars', 'cubancigars', 'traderfeedback', 'pipemaking'}
     },
     {
         "name": "'Merica",
@@ -165,20 +165,29 @@ COMMUNITIES: List[CommunityDefinition] = [
 ]
 
 
-def find_definition(community: Set[Node]) -> Optional[CommunityDefinition]:
+def find_definition(community: Set[Node], community_definitions: List[CommunityDefinition]) -> Optional[CommunityDefinition]:
     best: Optional[CommunityDefinition] = None
     best_score = 0.35
-    for definition in COMMUNITIES:
+    for definition in community_definitions:
         c = sum(1 if node in community else 0 for node in definition["common_nodes"])
         percent = c / len(definition["common_nodes"])
 
-        # The c / 20 term is arbitrary here, but tries to encourage higher count,
+        # The c / 10 term is arbitrary here, but tries to encourage higher count,
         #   so that a high count has a little bit of weight and the percent itself has the majority of the weight
-        score = percent + c / 20
+        score = percent + c / 10
         if score > best_score:
             best = definition
             best_score = score
     return best
+
+
+def find_community(definition_name: str, communities: List[Set[Node]], community_definitions: List[CommunityDefinition]) -> Optional[Set[Node]]:
+    for community in communities:
+        definition = find_definition(community, community_definitions)
+        if definition is not None and definition["name"] == definition_name:
+            return community
+
+    return None
 
 
 def combine_collapsed_graphs(graphs: List[nx.Graph]) -> nx.Graph:
@@ -199,12 +208,12 @@ def combine_collapsed_graphs(graphs: List[nx.Graph]) -> nx.Graph:
     return new_graph
 
 
-def print_community(community_number: int, file, graph: nx.Graph, community: Set[Node]):
+def print_community(community_number: int, file, graph: nx.Graph, community: Set[Node], community_definitions: List[CommunityDefinition]):
     MAX_DISPLAY = 3000
     # noinspection PyCallingNonCallable
     in_order = sorted(community, key=lambda node: graph.degree(node), reverse=True)
     more_string = "" if len(in_order) <= MAX_DISPLAY else f" and {len(in_order) - MAX_DISPLAY} more"
-    best_definition = find_definition(community)
+    best_definition = find_definition(community, community_definitions)
     name_string = f" ({best_definition['name']})" if best_definition is not None else ""
     print(f"Community {community_number}{name_string}: {in_order[:MAX_DISPLAY]}{more_string}", file=file)
 
@@ -228,7 +237,7 @@ def main():
     with open(Path("outputs", f"combined.txt"), 'w') as file:
         for i, community in enumerate(louvain_coms):
             if len(community) >= 20:
-                print_community(i + 1, file, combined_graph, community)
+                print_community(i + 1, file, combined_graph, community, ALL_COMMUNITY_DEFINITIONS)
 
     print("Found communities for combined graphs.")
 
@@ -242,7 +251,7 @@ def main():
         with open(Path("outputs", f"{name}.txt"), 'w') as file:
             for i, community in enumerate(louvain_coms):
                 if len(community) >= 20:
-                    print_community(i + 1, file, graph, community)
+                    print_community(i + 1, file, graph, community, ALL_COMMUNITY_DEFINITIONS)
 
 
 if __name__ == '__main__':
