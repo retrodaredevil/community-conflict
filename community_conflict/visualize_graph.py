@@ -1,10 +1,10 @@
 from pathlib import Path
-
 import networkx as nx
 import  random
 from community_conflict.cache import read_or_parse_file
 from community_conflict.subgraphs import sample_edges
 from community_conflict.subgraphs import sample_nodes
+from community_conflict.collapse import collapse
 import matplotlib.pyplot as plt
 """
 Purpose: To help visualize multi directed networks by drawing it in a output window
@@ -58,14 +58,34 @@ def draw_graph(graph: nx.MultiDiGraph, layout: int = 6, color_type: bool = False
     plt.axis('off')  # Turn off axis numbers and ticks
     plt.show()
 
+def draw_communities(graph: nx.MultiDiGraph):
+    node_size = []
+    community_graph = nx.Graph()
+    collapsed_graph = collapse(graph)
+    communities = list(nx.algorithms.community.louvain_communities(collapsed_graph))
+    for i, community in enumerate(communities):
+        if len(community) >= 20:
+            node_size.append(len(community)/2)
+            community_graph.add_node(i, count = len(community))
+
+    pos = nx.spring_layout(community_graph)
+    nx.draw_networkx_nodes(community_graph, pos, node_color="#aaabff", node_size=node_size)
+    nx.draw_networkx_edges(community_graph, pos, width=.75, edge_color='#505050', arrows=True, connectionstyle = f'arc3, rad = 0.0')
+    plt.axis('off')  # Turn off axis numbers and ticks
+    plt.show()
+
+    
+
 def main():
-    graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"), Path(".cache/soc-redditHyperlinks-title.pickle"))
-    edgeSub = sample_edges(graph, 500)
-    print(edgeSub)
+    title_graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"), Path(".cache/soc-redditHyperlinks-title.pickle"))
+    #edgeSub = sample_edges(graph, 500)
+    #print(edgeSub)
     #nodeSub = sample_nodes(graph, 50)
     #print(nodeSub)
-    draw_graph(edgeSub, edge_arc = 0.6)
+    #draw_graph(edgeSub, edge_arc = 0.6)
     #draw_graph(nodeSub, layout = 0)
+    draw_communities(title_graph)
+
 
 if __name__ == '__main__':
     main()
