@@ -3,7 +3,7 @@
 """
 This file has logic for collapsing a multi-graph into a simple graph
 """
-from typing import List, TypedDict
+from typing import List, TypedDict, Callable
 
 import networkx as nx
 
@@ -15,7 +15,9 @@ class CollapsedNodeAttributes(TypedDict):
     weight: float
 
 
-def contraction(
+ContractionFunction = Callable[[nx.MultiDiGraph, Node, Node, List[NodeAttributes]], CollapsedNodeAttributes]
+
+def contraction_weighted_on_keyword_similarity(
     graph: nx.MultiDiGraph, u: Node, v: Node, edge_data_list: List[NodeAttributes]
 ) -> CollapsedNodeAttributes:
     weight = 0.0
@@ -32,7 +34,7 @@ def contraction(
     }
 
 
-def collapse(graph: nx.MultiDiGraph) -> nx.Graph:
+def collapse(graph: nx.MultiDiGraph, contraction: ContractionFunction) -> nx.Graph:
     collapsed_graph = nx.Graph(graph)
 
     for u, v in collapsed_graph.edges():

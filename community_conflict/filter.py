@@ -2,7 +2,7 @@ import networkx as nx
 
 
 def subgraph_with_negative_posts(graph: nx.MultiDiGraph) -> nx.MultiDiGraph:
-    edges = graph.edges(data=True)
+    edges = graph.edges(keys=True, data=True)
     return graph.edge_subgraph(
-        (edge[0], edge[1]) for edge in edges if edge[2]["link_sentiment"] == -1
+        (u, v, key) for u, v, key, data in edges if data["link_sentiment"] == -1
     )
