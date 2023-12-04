@@ -1,8 +1,14 @@
 from pathlib import Path
 
 import pickle
+from typing import List
+
 import networkx as nx
+
+from community_conflict import Node, NodeAttributes
 from community_conflict.cache import read_or_parse_file
+from community_conflict.collapse import collapse, CollapsedNodeAttributes
+
 
 def compute_katz_centralities(graph: nx.Graph):
     """Compute various centrality measures relevant to our data and
@@ -26,7 +32,7 @@ def compute_edge_betweenness_centralities(graph: nx.Graph):
         edge_betweenness_cent = nx.edge_betweenness_centrality(graph)
         pickle.dump(edge_betweenness_cent, f)
 
-def compute_harmonic_centralities(graph: nx.graph):
+def compute_harmonic_centralities(graph: nx.Graph):
     with open("computed_values/harmonic_cent.pickle", "wb") as f:
         print("Computing Harmonic Centralities")
         harmonic_cent = nx.harmonic_centrality(graph)
@@ -83,8 +89,16 @@ def show_centralities():
     for node in page_rank[:15]:
         print("|{:<25}|{:>25.10f}|".format(node[0], node[1]))
 
+def contraction(graph: nx.MultiDiGraph, u: Node, v: Node, edge_data_list: List[NodeAttributes]) -> CollapsedNodeAttributes:
+    return {"weight": len(edge_data_list)}
+
 def main():
     graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"), Path(".cache/soc-redditHyperlinks-title.pickle"))
+    graph = collapse(graph)
+    compute_degree_centralities(graph)
+    compute_closeness_centralities(graph)
+    compute_harmonic_centralities(graph)
+    #compute_node_betweenness_centralities(graph)
     compute_pagerank(graph)
     show_centralities()
 
