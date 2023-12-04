@@ -52,6 +52,7 @@ def __test_main():
     multi.add_edge(3, 1)
     print(multi.get_edge_data(1, 2))
     print(nx.Graph(multi).get_edge_data(1, 2))
+    print(nx.Graph(multi).get_edge_data(1, 99))
     print(multi.get_edge_data(3, 1))
 
 
