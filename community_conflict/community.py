@@ -5,7 +5,7 @@ import networkx as nx
 
 from community_conflict import Node
 from community_conflict.cache import read_or_parse_file
-from community_conflict.collapse import collapse
+from community_conflict.collapse import collapse, contraction_weighted_on_keyword_similarity
 
 
 class CommunityDefinition(TypedDict):
@@ -218,8 +218,8 @@ def main():
     body_graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-body.tsv"),
                                     Path(".cache/soc-redditHyperlinks-body.pickle"))
     print("Collapsing graphs...")
-    title_collapsed_graph = collapse(title_graph)
-    body_collapsed_graph = collapse(body_graph)
+    title_collapsed_graph = collapse(title_graph, contraction=contraction_weighted_on_keyword_similarity)
+    body_collapsed_graph = collapse(body_graph, contraction=contraction_weighted_on_keyword_similarity)
     print("Done collapsing graphs.")
 
     print("Combining graphs and finding combined communities...")

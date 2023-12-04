@@ -4,7 +4,7 @@ import  random
 from community_conflict.cache import read_or_parse_file
 from community_conflict.subgraphs import sample_edges
 from community_conflict.subgraphs import sample_nodes
-from community_conflict.collapse import collapse
+from community_conflict.collapse import collapse, contraction_weighted_on_keyword_similarity
 import matplotlib.pyplot as plt
 """
 Purpose: To help visualize multi directed networks by drawing it in a output window
@@ -61,7 +61,7 @@ def draw_graph(graph: nx.MultiDiGraph, layout: int = 6, color_type: bool = False
 def draw_communities(graph: nx.MultiDiGraph):
     node_size = []
     community_graph = nx.Graph()
-    collapsed_graph = collapse(graph)
+    collapsed_graph = collapse(graph, contraction=contraction_weighted_on_keyword_similarity)
     communities = list(nx.algorithms.community.louvain_communities(collapsed_graph))
     for i, community in enumerate(communities):
         if len(community) >= 20:
