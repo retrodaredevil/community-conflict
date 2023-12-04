@@ -67,12 +67,13 @@ def draw_communities(graph: nx.MultiDiGraph):
         if len(community) >= 20:
             node_size.append(len(community)/2)
             community_graph.add_node(i, count = len(community))
-
-    pos = nx.spring_layout(community_graph)
-    nx.draw_networkx_nodes(community_graph, pos, node_color="#aaabff", node_size=node_size)
-    nx.draw_networkx_edges(community_graph, pos, width=.75, edge_color='#505050', arrows=True, connectionstyle = f'arc3, rad = 0.0')
-    plt.axis('off')  # Turn off axis numbers and ticks
-    plt.show()
+    for node in community_graph.nodes:
+        print(node[0])
+    #pos = nx.spring_layout(community_graph)
+    #nx.draw_networkx_nodes(community_graph, pos, node_color="#aaabff", node_size=node_size)
+    #nx.draw_networkx_edges(community_graph, pos, width=.75, edge_color='#505050', arrows=True, connectionstyle = f'arc3, rad = 0.0')
+    #plt.axis('off')  # Turn off axis numbers and ticks
+    #plt.show()
 
     
 
