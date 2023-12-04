@@ -6,17 +6,32 @@ from community_conflict.cache import read_or_parse_file
 from community_conflict.subgraphs import sample_edges
 from community_conflict.subgraphs import sample_nodes
 import matplotlib.pyplot as plt
-
-def draw_graph(graph: nx.MultiDiGraph, layout: int = 3, color_type: bool = False, node_size: int = 50, edge_width: float = 0.75):
+"""
+Purpose: To help visualize multi directed networks by drawing it in a output window
+Parameters: 
+graph - takes in a MultiDiGraph
+layout - integer from (0 to 7) to determine the layout used
+color_type - boolean detemines whether or not the function is mono-colored or multi-colored nodes
+node_size - integer determines size of nodes
+edge_width - boolean determines width of edges
+edge_arc - float determines the curviture of the edges
+"""
+def draw_graph(graph: nx.MultiDiGraph, layout: int = 6, color_type: bool = False, node_size: int = 50, edge_width: float = 0.75, edge_arc: float = 0.0):
     # positions for all nodes and layouts
     if(layout == 0):
-        pos = nx.kamada_kawai_layout(graph) # looks nice, computationaly expensive, and does work well with bigger networks for some reason
+        pos = nx.bipartite_layout(graph, graph.nodes)# makes a line if not used on bipartite graph
     elif(layout == 1):
-        pos = nx.random_layout(graph) #random places nodes looks squarish
+        pos = nx.circular_layout(graph) # makes a nice-ish looking oval
     elif(layout == 2):
-        pos = nx.shell_layout(graph) #makes an oval
+        pos = nx.kamada_kawai_layout(graph) # looks nice, computationaly expensive, and does work well with bigger networks for some reason
     elif(layout == 3):
-        pos = nx.spring_layout(graph) #ovalish but with random nodes thrown around
+        pos = nx.planar_layout(graph) #looks like a pyramaid(This is one of my favorites - Ian)
+    elif(layout == 4):
+        pos = nx.random_layout(graph) #random places nodes looks squarish
+    elif(layout == 5):
+        pos = nx.shell_layout(graph) #makes an oval with overlap kind harsh on the eyes
+    elif(layout == 6):
+        pos = nx.spring_layout(graph) #ovalish but with random nodes thrown around(default option easy to manage)
     else:
         pos = nx.spiral_layout(graph) #makes a spiral
 
@@ -32,8 +47,9 @@ def draw_graph(graph: nx.MultiDiGraph, layout: int = 3, color_type: bool = False
     # Draw nodes
     nx.draw_networkx_nodes(graph, pos, node_color=colors, node_size=node_size)
 
-    # Draw edges
-    nx.draw_networkx_edges(graph, pos, width=edge_width, edge_color='#505050', arrows=True, connectionstyle='arc3, rad = 0')
+    # Draw edge
+    #edge_arc is a float that determines how much an arc curves(recommended to stay between 0 and 1)
+    nx.draw_networkx_edges(graph, pos, width=edge_width, edge_color='#505050', arrows=True, connectionstyle = f'arc3, rad = {edge_arc}')
 
     # Draw labels
     #nx.draw_networkx_labels(graph, pos, font_size=3, font_color='black')
@@ -48,7 +64,7 @@ def main():
     print(edgeSub)
     #nodeSub = sample_nodes(graph, 50)
     #print(nodeSub)
-    draw_graph(edgeSub, layout = 2)
+    draw_graph(edgeSub, edge_arc = 0.6)
     #draw_graph(nodeSub, layout = 0)
 
 if __name__ == '__main__':
