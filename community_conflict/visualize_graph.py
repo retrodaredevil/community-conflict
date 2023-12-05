@@ -58,22 +58,34 @@ def draw_graph(graph: nx.MultiDiGraph, layout: int = 6, color_type: bool = False
     plt.axis('off')  # Turn off axis numbers and ticks
     plt.show()
 
-def draw_communities(graph: nx.MultiDiGraph):
+def draw_communities(graph: nx.Graph):
     node_size = []
+    edge_list = []
     community_graph = nx.Graph()
     collapsed_graph = collapse(graph, contraction=contraction_weighted_on_keyword_similarity)
     communities = list(nx.algorithms.community.louvain_communities(collapsed_graph))
+    id = 0
     for i, community in enumerate(communities):
         if len(community) >= 20:
             node_size.append(len(community)/2)
-            community_graph.add_node(i, count = len(community))
-    for node in community_graph.nodes:
-        print(node[0])
-    #pos = nx.spring_layout(community_graph)
-    #nx.draw_networkx_nodes(community_graph, pos, node_color="#aaabff", node_size=node_size)
-    #nx.draw_networkx_edges(community_graph, pos, width=.75, edge_color='#505050', arrows=True, connectionstyle = f'arc3, rad = 0.0')
-    #plt.axis('off')  # Turn off axis numbers and ticks
-    #plt.show()
+            community_graph.add_node(id, count = len(community), reddits = communities[i])
+            edge_list.append([])
+            for reddit in community_graph.nodes[id]['reddits']:
+                edge_list[id].append(list(graph.edges(reddit)))
+            id += 1
+    print(edge_list)
+
+    # iterates through community pairs
+    for node1_index in range(len(community_graph.nodes)):
+        for node2_index in range(node1_index+1, len(community_graph.nodes)):
+            for reddit in edge_list[node1_index]:
+                print(reddit[1])
+        
+    pos = nx.random_layout(community_graph)
+    nx.draw_networkx_nodes(community_graph, pos, node_color="#aaabff", node_size=node_size)
+    nx.draw_networkx_edges(community_graph, pos, width=.75, edge_color='#505050', arrows=True, connectionstyle = f'arc3, rad = 0.0')
+    plt.axis('off')  # Turn off axis numbers and ticks
+    plt.show()
 
     
 
