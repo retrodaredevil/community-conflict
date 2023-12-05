@@ -4,6 +4,8 @@ from typing import List, Set, Dict, Tuple
 import networkx as nx
 import itertools
 
+from matplotlib import pyplot as plt
+
 from community_conflict import Node
 from community_conflict.cache import read_or_parse_file
 from community_conflict.collapse import collapse, contraction_weighted_on_keyword_similarity
@@ -72,6 +74,56 @@ POLITICAL_COMMUNITY_DEFINITIONS: List[CommunityDefinition] = [
 ]
 
 
+def show_conflicts_negative_percentage_graph(conflicts: List[Tuple[int, int, str, str]]):
+    labels = []
+    negative_percentages = []
+    for positive_links, negative_links, a, b in sorted(conflicts, key=lambda conflict: conflict[1] / max(1, conflict[0] + conflict[1]), reverse=True):
+        total_links = positive_links + negative_links
+        if total_links > 200:
+            negative_percent = negative_links / total_links
+            print(f"Conflicts with source:  {a:<20} and target  {b:<20} : {negative_percent * 100.0:.2f}% with positive: {positive_links:<6} and negative: {negative_links:<6}")
+            labels.append(f"{a} to {b}")
+            negative_percentages.append(negative_percent * 100.0)
+
+    fig, ax = plt.subplots()
+    ax.bar(labels, negative_percentages, color='red')
+    ax.set_ylabel('Negative Percentage')
+    ax.set_xlabel('Source to Target')
+    ax.set_title('Negative Percentage for Conflicts')
+
+    plt.xticks(rotation=45, ha='right')
+
+    plt.show()
+
+
+def show_conflicts_negative_count_graph(conflicts: List[Tuple[int, int, str, str]]):
+    labels = []
+    negative_link_counts = []
+    total_link_counts = []
+    for positive_links, negative_links, a, b in sorted(conflicts, key=lambda conflict: conflict[1], reverse=True):
+        total_links = positive_links + negative_links
+        if total_links > 200:
+            labels.append(f"{a} to {b}")
+            negative_link_counts.append(negative_links)
+            total_link_counts.append(total_links)
+
+    bar_width = 0.35
+
+    fig, ax = plt.subplots()
+    ax.bar(range(len(negative_link_counts)), negative_link_counts, bar_width, color='red', label='Negative Links')
+    ax.bar([i + bar_width for i in range(len(negative_link_counts))], total_link_counts, bar_width, color='blue', label='Total Links')
+
+    ax.set_ylabel('Negative Links')
+    ax.set_xlabel('Source to Target')
+    ax.set_title('Negative Links for Conflicts')
+    ax.set_xticks([i + bar_width / 2 for i in range(len(negative_link_counts))])
+    ax.set_xticklabels(labels, rotation=45, ha='right')
+    ax.legend()
+
+    plt.show()
+
+
+
 def main():
     outputs_directory = Path("outputs")
     outputs_directory.mkdir(exist_ok=True)
@@ -118,6 +170,7 @@ def main():
             pair = (definition, community)
             focus_communities.append(pair)
 
+    conflicts: List[Tuple[int, int, str, str]] = []
     # now detect conflict between communities
     for (a_definition, a), (b_definition, b) in itertools.product(focus_communities, focus_communities):
         if a_definition == b_definition:
@@ -138,11 +191,11 @@ def main():
                 else:
                     negative_links += 1
 
-        negative_percent = negative_links / (positive_links + negative_links)
-        print(f"Conflicts with source: {a_definition['name']:<12} and target {b_definition['name']:<12} : {negative_percent * 100.0:.2f}%")
+        conflicts.append((positive_links, negative_links, a_definition['name'], b_definition['name']))
 
-    print("done")
-    print(len(focus_communities))
+    show_conflicts_negative_percentage_graph(conflicts)
+    show_conflicts_negative_count_graph(conflicts)
+
 
 
 if __name__ == '__main__':
