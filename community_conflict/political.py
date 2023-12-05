@@ -1,13 +1,16 @@
 from pathlib import Path
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Tuple
 
 import networkx as nx
+import itertools
 
 from community_conflict import Node
 from community_conflict.cache import read_or_parse_file
 from community_conflict.collapse import collapse, contraction_weighted_on_keyword_similarity
 from community_conflict.community import combine_collapsed_graphs, find_community, print_community, CommunityDefinition, \
-    ALL_COMMUNITY_DEFINITIONS
+    ALL_COMMUNITY_DEFINITIONS, find_definition
+
+EMPTY_DICT = dict()
 
 POLITICAL_COMMUNITY_DEFINITIONS: List[CommunityDefinition] = [
     {
@@ -105,6 +108,41 @@ def main():
     with open(Path(outputs_directory, "political.txt"), 'w') as file:
         for i, community in enumerate(political_communities):
             print_community(i + 1, file, simple_political_graph, community, POLITICAL_COMMUNITY_DEFINITIONS)
+
+    # focus_list = ["History", "Politics (Left)", "Race", "Ideologies", "Conspiracy", "Democrats", "Conservative"]
+    focus_communities: List[Tuple[CommunityDefinition, Set[Node]]] = []
+    for community in political_communities:
+        definition = find_definition(community, POLITICAL_COMMUNITY_DEFINITIONS)
+        # if definition is not None and definition["name"] in focus_list:
+        if definition is not None:
+            pair = (definition, community)
+            focus_communities.append(pair)
+
+    # now detect conflict between communities
+    for (a_definition, a), (b_definition, b) in itertools.product(focus_communities, focus_communities):
+        if a_definition == b_definition:
+            continue
+        positive_links = 0
+        negative_links = 0
+        for a_node, b_node in itertools.product(a, b):
+            title_edge_data_dict = title_graph.get_edge_data(a_node, b_node) or EMPTY_DICT
+            body_edge_data_dict = body_graph.get_edge_data(a_node, b_node) or EMPTY_DICT
+            for edge_data in title_edge_data_dict.values():
+                if edge_data["link_sentiment"] == 1:
+                    positive_links += 1
+                else:
+                    negative_links += 1
+            for edge_data in body_edge_data_dict.values():
+                if edge_data["link_sentiment"] == 1:
+                    positive_links += 1
+                else:
+                    negative_links += 1
+
+        negative_percent = negative_links / (positive_links + negative_links)
+        print(f"Conflicts with source: {a_definition['name']:<12} and target {b_definition['name']:<12} : {negative_percent * 100.0:.2f}%")
+
+    print("done")
+    print(len(focus_communities))
 
 
 if __name__ == '__main__':
