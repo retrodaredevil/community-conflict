@@ -60,6 +60,7 @@ def draw_graph(graph: nx.MultiDiGraph, layout: int = 6, color_type: bool = False
 
 def draw_communities(graph: nx.Graph):
     node_size = []
+    edge_weights = []
     edge_list = []
     community_graph = nx.Graph()
     collapsed_graph = collapse(graph, contraction=contraction_weighted_on_keyword_similarity)
@@ -73,7 +74,6 @@ def draw_communities(graph: nx.Graph):
             for reddit in community_graph.nodes[id]['reddits']:
                 edge_list[id].append(list(graph.edges(reddit)))
             id += 1
-    print(edge_list)
 
     for node1_index in range(len(community_graph.nodes)):
         reddits_set = set(community_graph.nodes[node1_index]['reddits'])
