@@ -22,32 +22,32 @@ def compute_katz_centralities(graph: nx.Graph):
 def compute_node_betweenness_centralities(graph: nx.Graph):
     with open("computed_values/node_betweenness_cent.pickle", "wb") as f:
         print("Computing Node Betweenness Centralities")
-        node_betweenness_cent = nx.betweenness_centrality(graph)
+        node_betweenness_cent = nx.betweenness_centrality(graph, weight="distance")
         pickle.dump(node_betweenness_cent, f)
 
 
 def compute_edge_betweenness_centralities(graph: nx.Graph):
     with open("computed_values/edge_betweenness_cent.pickle", "wb") as f:
         print("Computing Edge Betweenness Centralities")
-        edge_betweenness_cent = nx.edge_betweenness_centrality(graph)
+        edge_betweenness_cent = nx.edge_betweenness_centrality(graph, weight="distance")
         pickle.dump(edge_betweenness_cent, f)
 
 def compute_harmonic_centralities(graph: nx.Graph):
     with open("computed_values/harmonic_cent.pickle", "wb") as f:
         print("Computing Harmonic Centralities")
-        harmonic_cent = nx.harmonic_centrality(graph)
+        harmonic_cent = nx.harmonic_centrality(graph, distance="distance")
         pickle.dump(harmonic_cent, f)
 
 def compute_closeness_centralities(graph: nx.Graph):
     with open("computed_values/closeness_cent.pickle", "wb") as f:
         print("Computing Closeness Centralities")
-        closeness_cent = nx.closeness_centrality(graph)
+        closeness_cent = nx.closeness_centrality(graph, distance="distance")
         pickle.dump(closeness_cent, f)
 
 def compute_pagerank(graph: nx.Graph):
     with open("computed_values/pagerank.pickle", "wb") as f:
         print("Computing Page Rank")
-        page_rank = nx.pagerank(graph)
+        page_rank = nx.pagerank(graph, weight="weight")
         pickle.dump(page_rank, f)
 
 def compute_degree_centralities(graph: nx.Graph):
@@ -90,16 +90,18 @@ def show_centralities():
         print("|{:<25}|{:>25.10f}|".format(node[0], node[1]))
 
 def contraction(graph: nx.MultiDiGraph, u: Node, v: Node, edge_data_list: List[NodeAttributes]) -> CollapsedNodeAttributes:
-    return {"weight": len(edge_data_list)}
+    return {"weight": len(edge_data_list), "distance": 1 / len(edge_data_list)}
 
 def main():
     graph = read_or_parse_file(Path(".downloads/soc-redditHyperlinks-title.tsv"), Path(".cache/soc-redditHyperlinks-title.pickle"))
-    graph = collapse(graph)
-    compute_degree_centralities(graph)
-    compute_closeness_centralities(graph)
-    compute_harmonic_centralities(graph)
+    print(graph)
+    graph = collapse(graph, contraction)
+    print(graph)
+    #compute_degree_centralities(graph)
+    #compute_closeness_centralities(graph)
+    #compute_harmonic_centralities(graph)
     #compute_node_betweenness_centralities(graph)
-    compute_pagerank(graph)
+    #compute_pagerank(graph)
     show_centralities()
 
 

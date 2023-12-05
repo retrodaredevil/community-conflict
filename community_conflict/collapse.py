@@ -3,7 +3,7 @@
 """
 This file has logic for collapsing a multi-graph into a simple graph
 """
-from typing import List, TypedDict, Callable
+from typing import List, TypedDict, Callable, Optional
 
 import networkx as nx
 
@@ -12,7 +12,9 @@ from community_conflict.compute_weight import liwc_similarity
 
 
 class CollapsedNodeAttributes(TypedDict):
-    weight: float
+    weight: Optional[float]
+    distance: Optional[float]
+
 
 
 ContractionFunction = Callable[[nx.MultiDiGraph, Node, Node, List[NodeAttributes]], CollapsedNodeAttributes]
