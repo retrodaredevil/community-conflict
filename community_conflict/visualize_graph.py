@@ -75,24 +75,6 @@ def draw_communities(graph: nx.Graph):
             id += 1
     print(edge_list)
 
-    '''
-    # iterates through community pairs
-    for node1_index in range(len(community_graph.nodes)):
-        weight = 0
-        for node2_index in range(node1_index+1, len(community_graph.nodes)):
-
-            # iterates through all subreddits in community 1
-            for subreddit1 in range(len(edge_list[node1_index])):
-                # iterates through all edges in a subreddit in community 1
-                for edge in range(len(edge_list[node1_index][subreddit1])):
-
-                    # iterates through all subreddits in community 2 to see if edge goes there
-                    for subreddit2 in range(len(community_graph.nodes[node2_index]['reddits'])):
-                        subreddit_list = list(community_graph.nodes[node2_index]['reddits'])
-                        if (edge_list[node1_index][subreddit1][edge][1] == subreddit_list[subreddit2]):
-                            weight += 1
-            community_graph.add_edge(node1_index, node2_index, weight = weight)
-    '''
     for node1_index in range(len(community_graph.nodes)):
         reddits_set = set(community_graph.nodes[node1_index]['reddits'])
     
