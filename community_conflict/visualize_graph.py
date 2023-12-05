@@ -58,22 +58,40 @@ def draw_graph(graph: nx.MultiDiGraph, layout: int = 6, color_type: bool = False
     plt.axis('off')  # Turn off axis numbers and ticks
     plt.show()
 
-def draw_communities(graph: nx.MultiDiGraph):
+def draw_communities(graph: nx.Graph):
     node_size = []
+    edge_weights = []
+    edge_list = []
     community_graph = nx.Graph()
     collapsed_graph = collapse(graph, contraction=contraction_weighted_on_keyword_similarity)
     communities = list(nx.algorithms.community.louvain_communities(collapsed_graph))
+    id = 0
     for i, community in enumerate(communities):
         if len(community) >= 20:
             node_size.append(len(community)/2)
-            community_graph.add_node(i, count = len(community))
-    for node in community_graph.nodes:
-        print(node[0])
-    #pos = nx.spring_layout(community_graph)
-    #nx.draw_networkx_nodes(community_graph, pos, node_color="#aaabff", node_size=node_size)
-    #nx.draw_networkx_edges(community_graph, pos, width=.75, edge_color='#505050', arrows=True, connectionstyle = f'arc3, rad = 0.0')
-    #plt.axis('off')  # Turn off axis numbers and ticks
-    #plt.show()
+            community_graph.add_node(id, count = len(community), reddits = communities[i])
+            edge_list.append([])
+            for reddit in community_graph.nodes[id]['reddits']:
+                edge_list[id].append(list(graph.edges(reddit)))
+            id += 1
+
+    for node1_index in range(len(community_graph.nodes)):
+        reddits_set = set(community_graph.nodes[node1_index]['reddits'])
+    
+        for node2_index in range(node1_index + 1, len(community_graph.nodes)):
+            weight = 0
+            common_reddits = reddits_set.intersection(community_graph.nodes[node2_index]['reddits'])
+            weight += sum(1 for subreddit1 in edge_list[node1_index] for edge in subreddit1 if edge[1] in common_reddits)
+
+            community_graph.add_edge(node1_index, node2_index, weight=weight)
+    print(community_graph)
+
+        
+    pos = nx.spring_layout(community_graph)
+    nx.draw_networkx_nodes(community_graph, pos, node_color="#aaabff", node_size=node_size)
+    nx.draw_networkx_edges(community_graph, pos, width=.75, edge_color='#505050', arrows=True, connectionstyle = f'arc3, rad = 0.0')
+    plt.axis('off')  # Turn off axis numbers and ticks
+    plt.show()
 
     
 
