@@ -75,13 +75,37 @@ def draw_communities(graph: nx.Graph):
             id += 1
     print(edge_list)
 
+    '''
     # iterates through community pairs
     for node1_index in range(len(community_graph.nodes)):
+        weight = 0
         for node2_index in range(node1_index+1, len(community_graph.nodes)):
-            for reddit in edge_list[node1_index]:
-                print(reddit[1])
+
+            # iterates through all subreddits in community 1
+            for subreddit1 in range(len(edge_list[node1_index])):
+                # iterates through all edges in a subreddit in community 1
+                for edge in range(len(edge_list[node1_index][subreddit1])):
+
+                    # iterates through all subreddits in community 2 to see if edge goes there
+                    for subreddit2 in range(len(community_graph.nodes[node2_index]['reddits'])):
+                        subreddit_list = list(community_graph.nodes[node2_index]['reddits'])
+                        if (edge_list[node1_index][subreddit1][edge][1] == subreddit_list[subreddit2]):
+                            weight += 1
+            community_graph.add_edge(node1_index, node2_index, weight = weight)
+    '''
+    for node1_index in range(len(community_graph.nodes)):
+        reddits_set = set(community_graph.nodes[node1_index]['reddits'])
+    
+        for node2_index in range(node1_index + 1, len(community_graph.nodes)):
+            weight = 0
+            common_reddits = reddits_set.intersection(community_graph.nodes[node2_index]['reddits'])
+            weight += sum(1 for subreddit1 in edge_list[node1_index] for edge in subreddit1 if edge[1] in common_reddits)
+
+            community_graph.add_edge(node1_index, node2_index, weight=weight)
+    print(community_graph)
+
         
-    pos = nx.random_layout(community_graph)
+    pos = nx.spring_layout(community_graph)
     nx.draw_networkx_nodes(community_graph, pos, node_color="#aaabff", node_size=node_size)
     nx.draw_networkx_edges(community_graph, pos, width=.75, edge_color='#505050', arrows=True, connectionstyle = f'arc3, rad = 0.0')
     plt.axis('off')  # Turn off axis numbers and ticks
